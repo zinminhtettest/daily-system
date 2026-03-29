@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Build My Empire — Daily System v3</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,-apple-system,sans-serif;color:#1a1a1a;background:#fff;padding:0 1rem 4rem}
+.wrap{max-width:900px;margin:0 auto;padding:1.5rem 0}
+
+/* Hero */
+.hero{border-left:3px solid #1D9E75;padding:0.85rem 1.1rem;margin-bottom:1.5rem;background:#f5f5f3;border-radius:0 8px 8px 0}
+.hero h1{font-size:20px;font-weight:500;margin-bottom:4px}
+.hero p{font-size:13px;color:#666;line-height:1.5}
+.badge-row{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}
+.badge{font-size:11px;padding:3px 9px;border-radius:12px;font-weight:500}
+
+/* Quote banner */
+.quote{background:#26215C;border-radius:8px;padding:12px 16px;margin-bottom:1.5rem;display:flex;align-items:center;gap:12px}
+.quote-text{font-size:13px;color:#CECBF6;line-height:1.6;font-style:italic}
+.quote-attr{font-size:11px;color:#AFA9EC;margin-top:4px}
+
+/* Stats */
+.stats-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:7px;margin-bottom:1.5rem}
+.stat-card{background:#f5f5f3;border-radius:8px;padding:10px;border:0.5px solid #e0e0e0;text-align:center}
+.stat-num{font-size:21px;font-weight:500;line-height:1}
+.stat-lbl{font-size:10px;color:#777;margin-top:3px;line-height:1.4}
+
+/* Tabs */
+.tab-row{display:flex;flex-wrap:wrap;gap:0;margin-bottom:1.5rem;border-bottom:0.5px solid #e0e0e0}
+.tab{padding:8px 13px;font-size:12px;cursor:pointer;border-bottom:2px solid transparent;background:none;border-top:none;border-left:none;border-right:none;color:#777;white-space:nowrap}
+.tab.active{border-bottom:2px solid #1D9E75;color:#1a1a1a;font-weight:500}
+.tab-content{display:none}
+.tab-content.active{display:block}
+
+/* Section titles */
+.section-title{font-size:15px;font-weight:500;margin:1.75rem 0 0.85rem;padding-bottom:5px;border-bottom:0.5px solid #e0e0e0}
+.section-sub{font-size:13px;font-weight:500;color:#444;margin:1rem 0 0.5rem;padding-left:8px;border-left:2px solid #1D9E75}
+
+/* Timeline */
+.timeline{display:flex;flex-direction:column;gap:3px}
+.block{display:flex;gap:8px;align-items:stretch;min-height:40px}
+.time-col{width:82px;flex-shrink:0;display:flex;flex-direction:column;align-items:flex-end;justify-content:center;font-size:11px;color:#aaa;padding-right:6px;line-height:1.3}
+.time-dur{font-size:10px;color:#ccc}
+.bar{flex:1;border-radius:8px;padding:8px 11px;display:flex;flex-direction:column;justify-content:center;gap:2px;border:0.5px solid transparent}
+.bar-label{font-size:13px;font-weight:500;display:flex;align-items:center;flex-wrap:wrap;gap:4px}
+.bar-sub{font-size:11px;opacity:0.75;line-height:1.45;margin-top:1px}
+.new-tag{font-size:9px;font-weight:500;padding:1px 5px;border-radius:8px;background:#1D9E75;color:#fff;flex-shrink:0}
+.buddha-tag{font-size:9px;font-weight:500;padding:1px 5px;border-radius:8px;background:#534AB7;color:#EEEDFE;flex-shrink:0}
+.ronaldo-tag{font-size:9px;font-weight:500;padding:1px 5px;border-radius:8px;background:#D85A30;color:#FAECE7;flex-shrink:0}
+
+/* Bar colors */
+.b-buddha{background:#EEEDFE;border-color:#AFA9EC;color:#26215C}
+.b-wake{background:#E1F5EE;border-color:#9FE1CB;color:#085041}
+.b-deep1{background:#EEEDFE;border-color:#7F77DD;color:#26215C}
+.b-deep2{background:#EAF3DE;border-color:#97C459;color:#173404}
+.b-break{background:#f7f7f5;border-color:#e0e0e0;color:#777}
+.b-lang{background:#E6F1FB;border-color:#85B7EB;color:#042C53}
+.b-ops{background:#FAEEDA;border-color:#FAC775;color:#412402}
+.b-content{background:#FAECE7;border-color:#F0997B;color:#4A1B0C}
+.b-admin{background:#f7f7f5;border-color:#e0e0e0;color:#333}
+.b-gym{background:#E1F5EE;border-color:#1D9E75;color:#04342C}
+.b-invest{background:#E6F1FB;border-color:#378ADD;color:#042C53}
+.b-read{background:#FAEEDA;border-color:#BA7517;color:#412402}
+.b-dinner{background:#f7f7f5;border-color:#ddd;color:#555}
+.b-wind{background:#F1EFE8;border-color:#B4B2A9;color:#2C2C2A}
+.b-sleep{background:#26215C;border-color:#534AB7;color:#CECBF6}
+
+/* Labels legend */
+.label-row{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:1rem}
+.lbl{font-size:10px;padding:2px 8px;border-radius:4px;border:0.5px solid transparent}
+
+/* Divider */
+.div-line{height:0.5px;background:#efefef;margin:10px 0}
+
+/* Cards */
+.rule-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(175px,1fr));gap:9px;margin-bottom:1.25rem}
+.rule-card{background:#f7f7f5;border-radius:8px;padding:10px 12px;border:0.5px solid #e0e0e0}
+.rule-card .num{font-size:10px;color:#aaa;margin-bottom:3px;text-transform:uppercase;letter-spacing:0.5px}
+.rule-card .txt{font-size:12px;line-height:1.55;color:#333}
+
+/* Phase list */
+.phase-list{display:flex;flex-direction:column;gap:9px}
+.phase-item{display:flex;gap:11px;align-items:flex-start}
+.phase-dot{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:500;flex-shrink:0;margin-top:2px}
+.phase-body{flex:1}
+.phase-title{font-size:13px;font-weight:500;margin-bottom:3px}
+.phase-income{font-size:11px;color:#888;margin-bottom:3px}
+.phase-tasks{font-size:11px;color:#555;line-height:1.75}
+
+/* Priority grid */
+.pri-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));gap:8px;margin-bottom:1.25rem}
+.pri-card{border-radius:8px;padding:10px 12px;border:0.5px solid #e0e0e0;background:#fff}
+.pri-num{font-size:22px;font-weight:500;opacity:0.3;line-height:1}
+.pri-biz{font-size:12px;font-weight:500;margin:3px 0 2px}
+.pri-why{font-size:10px;color:#777;line-height:1.5}
+
+/* Week grid */
+.week-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;margin-bottom:1.25rem}
+.day-card{border-radius:8px;padding:9px 6px;border:0.5px solid #e0e0e0;text-align:center}
+.day-name{font-size:10px;font-weight:500;margin-bottom:3px}
+.day-theme{font-size:9px;color:#777;line-height:1.4;margin-bottom:3px}
+.day-focus{font-size:9px;font-weight:500;margin-top:3px;padding:2px 5px;border-radius:4px;display:inline-block}
+
+/* Recs */
+.rec-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(195px,1fr));gap:9px;margin-bottom:1.25rem}
+.rec-card{border-radius:8px;padding:11px 13px;border:0.5px solid #e0e0e0;background:#fff}
+.rec-title{font-size:12px;font-weight:500;margin-bottom:5px}
+.rec-body{font-size:11px;color:#666;line-height:1.6}
+
+/* Alerts */
+.alert{background:#fffbeb;border:0.5px solid #fbbf24;border-radius:8px;padding:10px 13px;margin:10px 0}
+.alert p{font-size:12px;color:#92400e;line-height:1.6}
+.alert-green{background:#F0FDF4;border:0.5px solid #86EFAC;border-radius:8px;padding:10px 13px;margin:10px 0}
+.alert-green p{font-size:12px;color:#14532d;line-height:1.6}
+.alert-purple{background:#EEEDFE;border:0.5px solid #AFA9EC;border-radius:8px;padding:10px 13px;margin:10px 0}
+.alert-purple p{font-size:12px;color:#26215C;line-height:1.6}
+
+/* Streak tracker */
+.streak-wrap{background:#f7f7f5;border-radius:8px;padding:14px;border:0.5px solid #e0e0e0;margin-bottom:1.25rem}
+.streak-title{font-size:13px;font-weight:500;margin-bottom:10px}
+.streak-grid{display:flex;flex-wrap:wrap;gap:4px}
+.streak-dot{width:18px;height:18px;border-radius:4px;border:0.5px solid #e0e0e0;cursor:pointer;transition:background 0.15s}
+.streak-dot.done{background:#1D9E75}
+.streak-dot.empty{background:#fff}
+.streak-info{font-size:11px;color:#888;margin-top:8px}
+.streak-count{font-size:22px;font-weight:500;color:#1D9E75;margin-top:4px}
+
+@media(max-width:620px){
+  .week-grid{grid-template-columns:repeat(4,1fr)}
+  .time-col{width:64px;font-size:10px}
+  .tab{padding:7px 9px;font-size:11px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<!-- HERO -->
+<div class="hero">
+  <h1>Build My Empire — Daily System <span style="font-size:13px;color:#1D9E75;font-weight:400">v3.0</span></h1>
+  <p>Zin Min Htet ၏ Complete Life + Business Routine · Ronaldo-level daily execution · $3,800/mo → $1,000,000 by 2030</p>
+  <div class="badge-row">
+    <span class="badge" style="background:#EEEDFE;color:#26215C">ဗုဒ္ဓဘာသာ practice ​— specific</span>
+    <span class="badge" style="background:#F1EFE8;color:#2C2C2A">Sleep 7hr (11PM→6AM)</span>
+    <span class="badge" style="background:#E1F5EE;color:#04342C">Gym — Mixed training</span>
+    <span class="badge" style="background:#E6F1FB;color:#042C53">Language — EN + Thai</span>
+    <span class="badge" style="background:#FAECE7;color:#993C1D">Reading 30min/night</span>
+  </div>
+</div>
+
+<!-- RONALDO QUOTE -->
+<div class="quote">
+  <div>
+    <div class="quote-text">"Talent without working hard is nothing. I prefer to be the best prepared — physically, mentally, spiritually. Every single day."</div>
+    <div class="quote-attr">— Cristiano Ronaldo · ညီ့ standard က ဒါပဲ</div>
+  </div>
+</div>
+
+<!-- STATS -->
+<div class="stats-row">
+  <div class="stat-card"><div class="stat-num" style="color:#26215C">1h</div><div class="stat-lbl">Buddhist<br>Practice</div></div>
+  <div class="stat-card"><div class="stat-num" style="color:#1D9E75">4.5h</div><div class="stat-lbl">Deep Work<br>Blocks</div></div>
+  <div class="stat-card"><div class="stat-num" style="color:#042C53">1.5h</div><div class="stat-lbl">Language<br>EN + Thai</div></div>
+  <div class="stat-card"><div class="stat-num" style="color:#993C1D">1.5h</div><div class="stat-lbl">Content<br>Creation</div></div>
+  <div class="stat-card"><div class="stat-num" style="color:#04342C">1.5h</div><div class="stat-lbl">Gym<br>Mixed</div></div>
+  <div class="stat-card"><div class="stat-num" style="color:#412402">30m</div><div class="stat-lbl">Reading<br>1 chapter</div></div>
+  <div class="stat-card"><div class="stat-num" style="color:#2C2C2A">7h</div><div class="stat-lbl">Sleep<br>11PM→6AM</div></div>
+</div>
+
+<!-- TABS -->
+<div class="tab-row">
+  <button class="tab active" onclick="showTab('weekday',this)">Weekday</button>
+  <button class="tab" onclick="showTab('weekend',this)">Weekend</button>
+  <button class="tab" onclick="showTab('weekly',this)">Weekly Theme</button>
+  <button class="tab" onclick="showTab('roadmap',this)">5-Year Roadmap</button>
+  <button class="tab" onclick="showTab('priority',this)">Priority</button>
+  <button class="tab" onclick="showTab('streak',this)">Streak Tracker</button>
+  <button class="tab" onclick="showTab('recs',this)">Extra Recs</button>
+</div>
+
+<!-- ============ WEEKDAY ============ -->
+<div id="weekday" class="tab-content active">
+  <p class="section-title">Weekday schedule (Monday – Friday)</p>
+
+  <div class="label-row">
+    <span class="lbl" style="background:#EEEDFE;color:#26215C;border-color:#AFA9EC">ဗုဒ္ဓဘာသာ</span>
+    <span class="lbl" style="background:#E1F5EE;color:#085041;border-color:#9FE1CB">Morning</span>
+    <span class="lbl" style="background:#EEEDFE;color:#26215C;border-color:#7F77DD">Deep work 1</span>
+    <span class="lbl" style="background:#EAF3DE;color:#173404;border-color:#97C459">Deep work 2</span>
+    <span class="lbl" style="background:#E6F1FB;color:#042C53;border-color:#85B7EB">Language</span>
+    <span class="lbl" style="background:#FAEEDA;color:#412402;border-color:#FAC775">Business ops</span>
+    <span class="lbl" style="background:#FAECE7;color:#4A1B0C;border-color:#F0997B">Content</span>
+    <span class="lbl" style="background:#E1F5EE;color:#04342C;border-color:#1D9E75">Gym</span>
+    <span class="lbl" style="background:#E6F1FB;color:#042C53;border-color:#378ADD">Invest</span>
+    <span class="lbl" style="background:#FAEEDA;color:#412402;border-color:#BA7517">Reading</span>
+    <span class="lbl" style="background:#26215C;color:#CECBF6;border-color:#534AB7">Sleep</span>
+  </div>
+
+  <div class="timeline">
+
+    <div class="block">
+      <div class="time-col">6:00<div class="time-dur">1 hr</div></div>
+      <div class="bar b-buddha">
+        <div class="bar-label">ဗုဒ္ဓဘာသာ Morning Practice <span class="buddha-tag">Buddhist</span></div>
+        <div class="bar-sub">
+          <b>ရွတ်ဆိုခြင်း</b> — Namo Tassa × 3 · ရတနာသုံးပါး ရွတ်ဆို · ပဉ္စသိလ ကြည်ညို (10 min)<br>
+          <b>တရားထိုင်</b> — Vipassana / Samatha meditation 25-30 min · ကြောသူ mind ကို ငြိမ်သက်<br>
+          <b>ဓမ္မပဒ / Sutta ဖတ်</b> — တစ်ရက် 1 verse / 1 sutta (10 min)<br>
+          <b>Metta ပွားများ</b> — မိမိ · မိသားစု · အားလုံး ကြင်နာမေတ္တာ ပို့ (5 min) · Phone မကြည့်ဘဲ ဒါနဲ့ နေ့ ဖွင့်
+        </div>
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="time-col">7:00<div class="time-dur">30 min</div></div>
+      <div class="bar b-wake">
+        <div class="bar-label">Morning ritual + breakfast + daily 3 priorities</div>
+        <div class="bar-sub">ရေသောက် · ကိုယ်ကာယ ပြင်ဆင် · Protein-rich breakfast · Notion ထဲ ယနေ့ top 3 tasks set · intention confirm</div>
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="time-col">7:30<div class="time-dur">2.5 hr</div></div>
+      <div class="bar b-deep1">
+        <div class="bar-label">Deep Work Block 1 <span class="ronaldo-tag">ELITE zone</span></div>
+        <div class="bar-sub">Phone airplane mode. Notification ပိတ်. Mr. Dream English scripts / Book chapters / YouTube strategy · ဒီ block က empire ၏ engine — Ronaldo ၏ training session နည်းတူ non-negotiable</div>
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="time-col">10:00<div class="time-dur">15 min</div></div>
+      <div class="bar b-break">
+        <div class="bar-label">Break — eyes rest + movement</div>
+        <div class="bar-sub">screen မကြည့်ဘဲ · ရေသောက် · 5 min လမ်းလျှောက် · brief mindful breathing</div>
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="time-col">10:15<div class="time-dur">2 hr</div></div>
+      <div class="bar b-deep2">
+        <div class="bar-label">Deep Work Block 2</div>
+        <div class="bar-sub">BSM Agency client strategy / E-Book KDP formatting + keywords / YouTube Empire pilot niche research / Book 2 outline work</div>
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="time-col">12:15<div class="time-dur">45 min</div></div>
+      <div class="bar b-wake">
+        <div class="bar-label">Lunch + rest (no screen)</div>
+        <div class="bar-sub">Deep work 4.5hr နောက် brain recharge လိုအပ်သည် · screen မကြည့်ဘဲ အစားအသောက် အာရုံစိုက် · 10 min power nap (ဖြစ်ရင်)</div>
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="time-col">1:00<div class="time-dur">1.5 hr</div></div>
+      <div class="bar b-lang">
+        <div class="bar-label">Language Learning <span class="new-tag">EN + THAI</span></div>
+        <div class="bar-sub">
+          <b>English (50 min)</b> — IELTS / CEFR structured study · Mr. Dream English script pronunciation practice · speaking fluency drills<br>
+          <b>Thai (40 min)</b> — daily conversation vocab · reading Thai script · useful for Chandrakasem Uni + Bangkok life<br>
+          Afternoon brain = language absorption peak time (neuroscience-backed)
+        </div>
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="time-col">2:30<div class="time-dur">1.5 hr</div></div>
+      <div class="bar b-ops">
+        <div class="bar-label">Business operations — 3 businesses oversight</div>
+        <div class="bar-sub">BSM client messages + reports · Visa Service team check-in · Gaming campaign review · Team 1-2 ကို task assign · Client calls (ဒီ window ထဲပဲ ချိန်းဆို) · Non-urgent Telegram/email</div>
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="time-col">4:00<div class="time-dur">15 min</div></div>
+      <div class="bar b-break">
+        <div class="bar-label">Break — pre-content switch</div>
+        <div class="bar-sub">stretch · ရေသောက် · creative mindset ကို switch</div>
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="time-col">4:15<div class="time-dur">1.5 hr</div></div>
+      <div class="bar b-content">
+        <div class="bar-label">Content Creation — Mr. Dream English</div>
+        <div class="bar-sub">ElevenLabs voice record · Descript edit · Vizard shorts cut · Thumbnail Canva Pro · YouTube upload + schedule · Batch production ဖြစ်ရင် 3+ videos တစ်ခါတည်း</div>
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="time-col">5:45<div class="time-dur">30 min</div></div>
+      <div class="bar b-admin">
+        <div class="bar-label">Admin + Notion daily log</div>
+        <div class="bar-sub">Tomorrow ၏ task ကြိုပြင် · KPI numbers update · Urgent messages respond · Non-critical items park for tomorrow</div>
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="time-col">6:15<div class="time-dur">1.5 hr</div></div>
+      <div class="bar b-gym">
+        <div class="bar-label">GYM — Mixed training <span class="ronaldo-tag">No skip</span></div>
+        <div class="bar-sub">
+          <b>Warm-up</b> 10 min · <b>Strength (compound lifts)</b> 40 min · <b>Cardio</b> 20 min · <b>Cool-down + stretch</b> 10 min<br>
+          Post-gym: Cold shower 2-3 min (muscle recovery + mental toughness) · Ronaldo ၏ body က daily discipline ၏ result — ညီ့ body လည်း ဒါပဲဖြစ်ရမည်
+        </div>
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="time-col">7:45<div class="time-dur">45 min</div></div>
+      <div class="bar b-dinner">
+        <div class="bar-label">Dinner + family call</div>
+        <div class="bar-sub">Post-workout protein meal (ဆန် + ကြက်ဥ/ကြက်/ငါး + ဟင်းသီးဟင်းရွက်) · မိဘ/ညီမ ဖုန်းဆက် · relax · screen light usage ပဲ</div>
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="time-col">8:30<div class="time-dur">30 min</div></div>
+      <div class="bar b-invest">
+        <div class="bar-label">Investment block — Crypto + Stocks</div>
+        <div class="bar-sub">Portfolio check · Market news digest · DCA schedule confirm · 1 topic deep research (altcoin, ETF, real estate, macro) · ညီ့ future millionaire status ၏ passive engine</div>
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="time-col">9:00<div class="time-dur">30 min</div></div>
+      <div class="bar b-read">
+        <div class="bar-label">Reading — 1 chapter per night</div>
+        <div class="bar-sub">Physical book / Kindle (screen warm tone) · Business / self-dev / biography · Recommended: Can't Hurt Me · Psychology of Money · Atomic Habits · screen မဟုတ်ဘဲ sleep quality +30%</div>
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="time-col">9:30<div class="time-dur">15 min</div></div>
+      <div class="bar b-buddha">
+        <div class="bar-label">Night Buddhist routine <span class="buddha-tag">Buddhist</span></div>
+        <div class="bar-sub">ညနေ ရွတ်ဆို (Itipiso · Karaniya Metta) · ကျေးဇူးတင်ကြောင်း 3 ခု Notion ထဲ ရေး · နေ့တွင် ကောင်းသောအမူအကျင့် ရှိခဲ့သလား ဆန်းစစ် · ငြိမ်သက်စွာ အိပ်ပျော်ဖို့ prepare</div>
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="time-col">9:45<div class="time-dur">1h 15m</div></div>
+      <div class="bar b-wind">
+        <div class="bar-label">Wind down + free buffer time</div>
+        <div class="bar-sub">dim lights · ကြိုက်တာ တစ်ခုခု relax (music, light content, ငြိမ်ငြိမ်ထိုင်) · phone brightness ↓ · brain ကို sleep mode ကို ဖြည်းဖြည်း ချ · ဒါ earned rest time ဖြစ်သည်</div>
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="time-col">11:00<div class="time-dur">7 hr</div></div>
+      <div class="bar b-sleep">
+        <div class="bar-label">Sleep — 7 hours (11:00 PM → 6:00 AM)</div>
+        <div class="bar-sub">Ronaldo က 5×90-min naps, ညီ က continuous 7hr — both elite recovery methods · Sleep = muscle repair + memory consolidation + empire planning ၏ foundation · Phone ကို အခြားခမ်းမှာ ထားပါ</div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="alert-purple" style="margin-top:1rem">
+    <p>☸ ဗုဒ္ဓဘာသာ practice ကို schedule ၏ ပထမ block မှာ ထားသည် — မည်သည့် business meeting, client call, content creation မဟုတ်ဘဲ ဘုရားကို ပထမဆုံး ပေးသောနေ့ ကို တည်ဆောက်ပါ။ Spiritual foundation ရှိမှ business decisions တွင် clarity, wisdom, patience ရမည်။ ဒါ productivity hack မဟုတ်ဘဲ life principle ဖြစ်သည်။</p>
+  </div>
+  <div class="alert" style="margin-top:6px">
+    <p>⚠ Phone rule — 6:00 AM Buddhist practice မတိုင်ခင် phone မကြည့်ပါ။ Deep Work blocks 2 ခုတွင် airplane mode ။ ဒါ Ronaldo ၏ training အတွင်း distraction မခံသည့် spirit နဲ့ တူသည်။</p>
+  </div>
+</div>
+
+<!-- ============ WEEKEND ============ -->
+<div id="weekend" class="tab-content">
+  <p class="section-title">Weekend schedule</p>
+  <p style="font-size:12px;color:#666;margin-bottom:1.25rem">Saturday = Mega batch production · Sunday = Extended spiritual + sacred rest</p>
+
+  <p class="section-sub">Saturday</p>
+  <div class="timeline" style="margin-bottom:1.25rem">
+    <div class="block"><div class="time-col">6:00<div class="time-dur">1.5 hr</div></div><div class="bar b-buddha"><div class="bar-label">Extended Buddhist morning <span class="buddha-tag">Buddhist</span></div><div class="bar-sub">Weekend = ပိုချိန်ရသော deeper practice · ရွတ်ဆိုခြင်း · Sutta တစ်ပုဒ် နှိုင်းနှိုင်းနင်းနင်း ဖတ် · 40-45 min meditation · Metta sending · grateful reflection</div></div></div>
+    <div class="block"><div class="time-col">7:30<div class="time-dur">30 min</div></div><div class="bar b-wake"><div class="bar-label">Slow breakfast — no rush</div><div class="bar-sub">Saturday morning energy ကို enjoy · coffee · window မှ ကြည့် · intention set</div></div></div>
+    <div class="block"><div class="time-col">8:00<div class="time-dur">4 hr</div></div><div class="bar b-deep1"><div class="bar-label">Mega Batch Production <span class="ronaldo-tag">Champion session</span></div><div class="bar-sub">Mr. Dream English 3-5 videos record/edit · Book chapters 2-3 ပြီးမြောက် · Week တစ်ပတ်စာ content တစ်ပြိုင်နက် · Saturday batch က weekday pressure ₁₀× လျှော့ချပေးသည်</div></div></div>
+    <div class="block"><div class="time-col">12:00<div class="time-dur">1 hr</div></div><div class="bar b-wake"><div class="bar-label">Lunch + power rest</div><div class="bar-sub">proper meal · 20 min power nap (optional) · no screen · recharge</div></div></div>
+    <div class="block"><div class="time-col">1:00<div class="time-dur">1.5 hr</div></div><div class="bar b-lang"><div class="bar-label">Language deep study session</div><div class="bar-sub">Weekend: longer uninterrupted study · Mock IELTS test / Thai conversation drill / vocabulary expansion · No business interruptions</div></div></div>
+    <div class="block"><div class="time-col">2:30<div class="time-dur">1 hr</div></div><div class="bar b-ops"><div class="bar-label">BSM Agency + Visa Service weekly catchup</div><div class="bar-sub">Client reports review · Strategy for next week · Team feedback · Gaming monthly check</div></div></div>
+    <div class="block"><div class="time-col">3:30<div class="time-dur">1.5 hr</div></div><div class="bar b-invest"><div class="bar-label">Investment deep dive</div><div class="bar-sub">Weekend market study time · Crypto chart analysis · Stock research · Real estate info · Portfolio rebalance if needed</div></div></div>
+    <div class="block"><div class="time-col">5:00<div class="time-dur">2 hr</div></div><div class="bar b-gym"><div class="bar-label">Gym — longer weekend session</div><div class="bar-sub">Saturday = ပိုချိန်ရ · Compound lifts + full body · cardio + flexibility · Post: cold shower · Ronaldo-level recovery routine</div></div></div>
+    <div class="block"><div class="time-col">7:00<div class="time-dur">1 hr</div></div><div class="bar b-admin"><div class="bar-label">Weekly review (Notion) + dinner</div><div class="bar-sub">Wins · Misses · Numbers · Next week top 3 · Income snapshot · Content metrics · Investment numbers — data-driven empire management</div></div></div>
+    <div class="block"><div class="time-col">8:00<div class="time-dur">1 hr</div></div><div class="bar b-wind"><div class="bar-label">Free time + reading + wind down</div><div class="bar-sub">earned rest · 1-2 chapters · relax · no business thinking after 8 PM Saturday</div></div></div>
+    <div class="block"><div class="time-col">9:00<div class="time-dur">15 min</div></div><div class="bar b-buddha"><div class="bar-label">Night chanting + gratitude</div><div class="bar-sub">ညနေ ရွတ်ဆို · ကျေးဇူးတင်ကြောင်း ၃ ခု · peaceful close of Saturday</div></div></div>
+    <div class="block"><div class="time-col">11:00<div class="time-dur">7 hr</div></div><div class="bar b-sleep"><div class="bar-label">Sleep</div><div class="bar-sub">7 hours · 11 PM → 6 AM</div></div></div>
+  </div>
+
+  <p class="section-sub">Sunday</p>
+  <div class="timeline">
+    <div class="block"><div class="time-col">6:00<div class="time-dur">2 hr</div></div><div class="bar b-buddha"><div class="bar-label">Extended Sunday spiritual morning <span class="buddha-tag">Sacred</span></div><div class="bar-sub">Sunday = Full spiritual dedication · Extended meditation 45-60 min · ဘုရားကျောင်း သွား (ဖြစ်ရင်) · ဓမ္မ တစ်ပုဒ် နှိုင်းနှိုင်းနင်းနင်း study · Week ကို spiritually prepare · Metta meditation for all beings</div></div></div>
+    <div class="block"><div class="time-col">8:00<div class="time-dur">1 hr</div></div><div class="bar b-wake"><div class="bar-label">Slow morning + family call</div><div class="bar-sub">Proper breakfast · မိဘ/ညီမ ဖုန်းဆက် · no rush · enjoy Sunday morning · connection time</div></div></div>
+    <div class="block"><div class="time-col">9:00<div class="time-dur">1.5 hr</div></div><div class="bar b-read"><div class="bar-label">Reading + learning (no pressure)</div><div class="bar-sub">books / courses / YouTube education · creative thinking / strategy brainstorm · not execution — thinking only</div></div></div>
+    <div class="block"><div class="time-col">10:30<div class="time-dur">1 hr</div></div><div class="bar b-gym"><div class="bar-label">Active recovery — light movement</div><div class="bar-sub">Sunday = recovery day · light walk / yoga / stretch · gym optional (မသွားလည်း fine) · body မှာ rest ပေးပါ</div></div></div>
+    <div class="block"><div class="time-col">11:30<div class="time-dur">5 hr</div></div><div class="bar b-wind"><div class="bar-label">SACRED REST — 5 hours protected</div><div class="bar-sub">ZERO business thinking · friends, nature, hobbies, personal interest · phone usage minimal · ဒါ burnout prevention insurance ဖြစ်သည် · protect ရမည်</div></div></div>
+    <div class="block"><div class="time-col">4:30<div class="time-dur">1 hr</div></div><div class="bar b-admin"><div class="bar-label">Next week preparation</div><div class="bar-sub">Monday Deep Work task ကြိုပြင် · Content calendar finalize · Notion top 3 ကြိုထည့် · Week ကို win ဖို့ prepare on Sunday</div></div></div>
+    <div class="block"><div class="time-col">5:30<div class="time-dur">1 hr</div></div><div class="bar b-lang"><div class="bar-label">Language review (maintenance mode)</div><div class="bar-sub">light review only · flashcards / listening / vocab revision · heavy study မဟုတ် — brain consolidate ပဲ</div></div></div>
+    <div class="block"><div class="time-col">6:30<div class="time-dur">1 hr</div></div><div class="bar b-dinner"><div class="bar-label">Dinner + personal evening</div><div class="bar-sub">relax · enjoy Sunday · favorite food · no pressure</div></div></div>
+    <div class="block"><div class="time-col">7:30<div class="time-dur">30 min</div></div><div class="bar b-invest"><div class="bar-label">Quick investment check</div><div class="bar-sub">portfolio glance · no deep research — Sunday evening light</div></div></div>
+    <div class="block"><div class="time-col">8:00<div class="time-dur">45 min</div></div><div class="bar b-read"><div class="bar-label">Reading + wind down</div><div class="bar-sub">1 chapter · gratitude journal · tomorrow intention set</div></div></div>
+    <div class="block"><div class="time-col">8:45<div class="time-dur">15 min</div></div><div class="bar b-buddha"><div class="bar-label">Sunday night Buddhist closing</div><div class="bar-sub">ညနေ ရွတ်ဆို · ကမ္ဘာ သတ္တဝါ အားလုံး ချမ်းသာကြပါစေ Metta · peaceful close</div></div></div>
+    <div class="block"><div class="time-col">9:00<div class="time-dur">2 hr</div></div><div class="bar b-wind"><div class="bar-label">Extended wind down</div><div class="bar-sub">Early Sunday evening rest — tomorrow strong Monday ကို ပြင်ဆင် · dim lights · phone down</div></div></div>
+    <div class="block"><div class="time-col">11:00<div class="time-dur">7 hr</div></div><div class="bar b-sleep"><div class="bar-label">Sleep — 11 PM → 6 AM</div><div class="bar-sub">Sunday night sleep = entire week ၏ foundation</div></div></div>
+  </div>
+</div>
+
+<!-- ============ WEEKLY THEME ============ -->
+<div id="weekly" class="tab-content">
+  <p class="section-title">Weekly theme system</p>
+  <div class="week-grid">
+    <div class="day-card" style="border-color:#7F77DD"><div class="day-name" style="color:#534AB7">Monday</div><div class="day-theme">Empire<br>Launch</div><div class="day-focus" style="background:#EEEDFE;color:#26215C">Mr. Dream</div></div>
+    <div class="day-card" style="border-color:#F0997B"><div class="day-name" style="color:#993C1D">Tuesday</div><div class="day-theme">Creation<br>Day</div><div class="day-focus" style="background:#FAECE7;color:#4A1B0C">Book+Content</div></div>
+    <div class="day-card" style="border-color:#FAC775"><div class="day-name" style="color:#854F0B">Wednesday</div><div class="day-theme">Business<br>Ops</div><div class="day-focus" style="background:#FAEEDA;color:#412402">BSM+Visa+Game</div></div>
+    <div class="day-card" style="border-color:#97C459"><div class="day-name" style="color:#3B6D11">Thursday</div><div class="day-theme">Growth<br>Day</div><div class="day-focus" style="background:#EAF3DE;color:#173404">Content+Lang</div></div>
+    <div class="day-card" style="border-color:#85B7EB"><div class="day-name" style="color:#185FA5">Friday</div><div class="day-theme">Review +<br>Finance</div><div class="day-focus" style="background:#E6F1FB;color:#042C53">Numbers+Invest</div></div>
+    <div class="day-card" style="border-color:#7F77DD"><div class="day-name" style="color:#534AB7">Saturday</div><div class="day-theme">Batch<br>Champion</div><div class="day-focus" style="background:#EEEDFE;color:#26215C">Mass Create</div></div>
+    <div class="day-card" style="border-color:#AFA9EC"><div class="day-name" style="color:#534AB7">Sunday</div><div class="day-theme">Sacred<br>Spirit+Rest</div><div class="day-focus" style="background:#FBEAF0;color:#4B1528">☸ Recharge</div></div>
+  </div>
+
+  <p class="section-title">The 7 non-negotiable laws</p>
+  <div class="rule-grid">
+    <div class="rule-card" style="border-left:2px solid #534AB7"><div class="num">Law 01</div><div class="txt">ဗုဒ္ဓဘာသာ practice က FIRST block — မည်သည့်အရာမှ ဒါ မတိုင်ခင် မစပါ</div></div>
+    <div class="rule-card" style="border-left:2px solid #1D9E75"><div class="num">Law 02</div><div class="txt">Deep Work 7:30-12:15 — Phone airplane mode · ဒါ negotiate ဆိုသည့် concept မရှိ</div></div>
+    <div class="rule-card" style="border-left:2px solid #042C53"><div class="num">Law 03</div><div class="txt">Client calls + meetings — 2:30 PM မတိုင်ခင် schedule မချပါနှင့် · morning ကို guard လုပ်</div></div>
+    <div class="rule-card" style="border-left:2px solid #04342C"><div class="num">Law 04</div><div class="txt">Gym 6:15 PM — rain든 tired든 — Ronaldo မပျက်ဘဲ training သွားသကဲ့သို့ ညီ့ gym ကလည်း ဒါပဲ</div></div>
+    <div class="rule-card" style="border-left:2px solid #412402"><div class="num">Law 05</div><div class="txt">Reading pre-sleep — screen မဟုတ်ဘဲ book — ညနေ ကျောင်း ဖြစ်သည်</div></div>
+    <div class="rule-card" style="border-left:2px solid #2C2C2A"><div class="num">Law 06</div><div class="txt">Sleep 11 PM sharp — late night scroll / work = next day ၏ deep work quality ကို kill လုပ်သည်</div></div>
+    <div class="rule-card" style="border-left:2px solid #993C1D"><div class="num">Law 07</div><div class="txt">Sunday sacred rest — business thinking ကို 4:30 PM မတိုင်ခင် ခွင့်မပြု · ဒါ burnout insurance</div></div>
+  </div>
+</div>
+
+<!-- ============ ROADMAP ============ -->
+<div id="roadmap" class="tab-content">
+  <p class="section-title">5-year millionaire roadmap — 2026 to 2030</p>
+  <p style="font-size:12px;color:#666;margin-bottom:1.25rem">$3,800/month → $1,000,000 net worth</p>
+  <div class="phase-list">
+    <div class="phase-item">
+      <div class="phase-dot" style="background:#E1F5EE;color:#085041">P1</div>
+      <div class="phase-body">
+        <div class="phase-title">Phase 1 — Foundation (2026 H1)</div>
+        <div class="phase-income">Target: $3,800 → $5,500/month</div>
+        <div class="phase-tasks">✦ "Make An Effort" KDP publish + Amazon Ads launch<br>✦ Mr. Dream English ပထမ videos 32 ခု upload · schedule set<br>✦ BSM + Visa Service SOPs ရေး → team delegate<br>✦ Crypto + Stock portfolio $500-1,000 ဖြင့် DCA စတင်<br>✦ English CEFR B2→C1 push · Thai basic conversation<br>✦ Gym 90-day no-miss habit establish · cold shower daily</div>
+      </div>
+    </div>
+    <div class="phase-item">
+      <div class="phase-dot" style="background:#FAEEDA;color:#412402">P2</div>
+      <div class="phase-body">
+        <div class="phase-title">Phase 2 — Momentum (2026 H2)</div>
+        <div class="phase-income">Target: $5,500 → $9,000/month</div>
+        <div class="phase-tasks">✦ Mr. Dream English 500-1,500 subscribers · watch hours climbing<br>✦ Book 2 (Side Hustle Blueprint) writing complete<br>✦ YouTube Empire pilot channels 2-3 ခု launch<br>✦ BSM Agency founder time 50% ↓ · systemized<br>✦ Investment DCA $300-500/month compound growing<br>✦ Chandrakasem Rajabhat — schedule integrate if confirmed</div>
+      </div>
+    </div>
+    <div class="phase-item">
+      <div class="phase-dot" style="background:#EEEDFE;color:#26215C">P3</div>
+      <div class="phase-body">
+        <div class="phase-title">Phase 3 — Scale (2027)</div>
+        <div class="phase-income">Target: $9,000 → $18,000/month</div>
+        <div class="phase-tasks">✦ Mr. Dream English YouTube Partner Program monetized<br>✦ Book 2 published · Book 3 outline started<br>✦ YouTube Empire 5-10 channels active<br>✦ Personal brand (English + Myanmar) building<br>✦ Investment portfolio $15,000-25,000 accumulated<br>✦ All 3 businesses founder-free 80% · team runs</div>
+      </div>
+    </div>
+    <div class="phase-item">
+      <div class="phase-dot" style="background:#FAECE7;color:#4A1B0C">P4</div>
+      <div class="phase-body">
+        <div class="phase-title">Phase 4 — Empire (2028-2029)</div>
+        <div class="phase-income">Target: $18,000 → $40,000/month</div>
+        <div class="phase-tasks">✦ 15-20 YouTube channels monetized · global reach<br>✦ Author brand — 3-4 books published internationally<br>✦ Personal branding fully established (Mar 2029 deadline)<br>✦ Sponsorships + brand deals flowing<br>✦ Investment portfolio $80,000-150,000<br>✦ All businesses 100% founder-independent</div>
+      </div>
+    </div>
+    <div class="phase-item">
+      <div class="phase-dot" style="background:#E6F1FB;color:#042C53">P5</div>
+      <div class="phase-body">
+        <div class="phase-title">Phase 5 — Millionaire (2029-2030)</div>
+        <div class="phase-income">Net worth target: $1,000,000+</div>
+        <div class="phase-tasks">✦ 20+ YouTube channels all monetized<br>✦ Passive book royalties + AdSense compounding<br>✦ Investment portfolio generating passive returns<br>✦ Capital ready for Mandalay Electronics Mall (2031+)<br>✦ Geographic freedom · work from anywhere<br>✦ Legacy building · inspiring Myanmar entrepreneurs</div>
+      </div>
+    </div>
+  </div>
+  <div class="alert" style="margin-top:1rem"><p>⚠ Gym + Language + Buddhist practice ကို routine ထဲ ထည့်ခြင်းသည် empire path ကို slow မဖြစ်စေ — fast ဖြစ်စေသည်။ Physical health = energy. Spiritual clarity = better decisions. Language = global reach. ဒါ ၃ ခုက compound return ရသော life investments ဖြစ်သည်။</p></div>
+</div>
+
+<!-- ============ PRIORITY ============ -->
+<div id="priority" class="tab-content">
+  <p class="section-title">Business priority — deep work allocation</p>
+  <div class="pri-grid">
+    <div class="pri-card" style="border-color:#7F77DD"><div class="pri-num" style="color:#534AB7">01</div><div class="pri-biz">Mr. Dream English</div><div class="pri-why">$0 → monetization · global · YouTube Empire foundation · highest growth</div></div>
+    <div class="pri-card" style="border-color:#97C459"><div class="pri-num" style="color:#3B6D11">02</div><div class="pri-biz">E-Book Publishing</div><div class="pri-why">"Make An Effort" publish NOW · passive royalties · Book 2 pipeline</div></div>
+    <div class="pri-card" style="border-color:#FAC775"><div class="pri-num" style="color:#BA7517">03</div><div class="pri-biz">BSM Boost Agency</div><div class="pri-why">$1,300/mo · systemize · delegate → founder time ↓</div></div>
+    <div class="pri-card" style="border-color:#85B7EB"><div class="pri-num" style="color:#378ADD">04</div><div class="pri-biz">Visa Service</div><div class="pri-why">$1,200/mo · delegate ≥80% · oversight only · SOP run</div></div>
+    <div class="pri-card" style="border-color:#F0997B"><div class="pri-num" style="color:#D85A30">05</div><div class="pri-biz">Online Gaming</div><div class="pri-why">$1,300/mo · monthly check · team fully run · ညီ မပါ ရပ်တည်ရမည်</div></div>
+  </div>
+  <p class="section-title">Life priority (non-business)</p>
+  <div class="rule-grid">
+    <div class="rule-card" style="border-left:2px solid #534AB7"><div class="num">Priority A — Spirit</div><div class="txt">ဗုဒ္ဓဘာသာ practice က ယနေ့ ညီ့ life ၏ foundation — business, gym, content — ဘာမှ ဒါ မတိုင်ခင် မ prioritize</div></div>
+    <div class="rule-card" style="border-left:2px solid #04342C"><div class="num">Priority B — Gym</div><div class="txt">Body က ညီ့ business ၏ hardware — hardware fail ရင် software (ideas, energy, creativity) လည်း fail</div></div>
+    <div class="rule-card" style="border-left:2px solid #042C53"><div class="num">Priority C — Language</div><div class="txt">English C1 = Mr. Dream English reach × 10 · Thai = Bangkok life easier + Uni advantage</div></div>
+    <div class="rule-card" style="border-left:2px solid #412402"><div class="num">Priority D — Reading</div><div class="txt">12 books/year = knowledge compound · leaders တွေ read တာကြောင့် lead ဖြစ်တာ မဟုတ်ဘဲ read လုပ်နိုင်တဲ့ leader တွေ ဖြစ်ကြသည်</div></div>
+  </div>
+</div>
+
+<!-- ============ STREAK TRACKER ============ -->
+<div id="streak" class="tab-content">
+  <p class="section-title">90-Day Ronaldo Streak Tracker</p>
+  <p style="font-size:12px;color:#666;margin-bottom:1rem">တစ်ရက် complete ဖြစ်ရင် dot ကို နှိပ်ပါ · 90 ရက် ပြည့်ရင် identity ပြောင်းသည် — "I am someone who never misses"</p>
+
+  <div class="streak-wrap">
+    <div class="streak-title">Daily completion — click each day you complete</div>
+    <div class="streak-grid" id="dots"></div>
+    <div style="display:flex;gap:16px;margin-top:10px;align-items:center">
+      <div><div class="streak-count" id="count">0</div><div class="streak-info">days completed</div></div>
+      <div style="font-size:11px;color:#aaa">out of 90 days</div>
+      <button onclick="resetStreak()" style="margin-left:auto;font-size:11px;padding:4px 10px;border:0.5px solid #ddd;background:#fff;border-radius:6px;cursor:pointer;color:#999">Reset</button>
+    </div>
+  </div>
+
+  <p class="section-title">Daily checklist (every single day)</p>
+  <div class="rule-grid">
+    <div class="rule-card"><div class="num">☸ Spirit</div><div class="txt">Buddhist morning practice completed · chanting + meditation + Dhamma</div></div>
+    <div class="rule-card"><div class="num">💪 Gym</div><div class="txt">Mixed training session completed · cold shower after</div></div>
+    <div class="rule-card"><div class="num">📚 Language</div><div class="txt">English + Thai study 1.5 hrs done · no shortcuts</div></div>
+    <div class="rule-card"><div class="num">⚡ Deep Work</div><div class="txt">Both Deep Work blocks protected · phone off · output produced</div></div>
+    <div class="rule-card"><div class="num">📖 Reading</div><div class="txt">1 chapter completed before sleep</div></div>
+    <div class="rule-card"><div class="num">💰 Invest</div><div class="txt">30 min portfolio + research done</div></div>
+    <div class="rule-card"><div class="num">🌙 Sleep</div><div class="txt">In bed by 11 PM · 7 hours secured</div></div>
+    <div class="rule-card"><div class="num">📝 Notion</div><div class="txt">Daily wins 3 ခု + gratitude 3 ခု logged</div></div>
+  </div>
+
+  <div class="alert-green">
+    <p>✦ Ronaldo ၏ greatness သည် talent မဟုတ်ပါ — "I've seen players with more talent than me who never made it because they couldn't work every single day." ညီ့ commitment က ဒါပဲ — every single day, no excuses. 90 ရက် ပြည့်ရင် ညီ့ brain မှာ new identity install ဖြစ်ပြီ — ပြန် skip ဖို့ impossible ဖြစ်သွားမည်။</p>
+  </div>
+</div>
+
+<!-- ============ EXTRA RECS ============ -->
+<div id="recs" class="tab-content">
+  <p class="section-title">Additional recommendations</p>
+  <div class="rec-grid">
+    <div class="rec-card" style="border-left:3px solid #534AB7">
+      <div class="rec-title">☸ ဘုရားကျောင်း — လတစ်ကြိမ်</div>
+      <div class="rec-body">Daily home practice နဲ့ ထပ်ပြီး လတစ်ကြိမ် ဘုရားကျောင်း တက်ပါ (Bangkok မှာ Thai Buddhist temples များ)။ Sangha connection = spiritual community = stronger practice anchor။</div>
+    </div>
+    <div class="rec-card" style="border-left:3px solid #04342C">
+      <div class="rec-title">Cold Shower — post-gym daily</div>
+      <div class="rec-body">Gym ပြီးတိုင်း 2-3 min cold shower။ Muscle recovery + dopamine ↑ + mental toughness compound ဖြစ်သည်။ Goggins + Wim Hof method — hard things build hard people။</div>
+    </div>
+    <div class="rec-card" style="border-left:3px solid #BA7517">
+      <div class="rec-title">Quarterly Empire Audit Day</div>
+      <div class="rec-body">3 လတစ်ကြိမ် တစ်နေ့ပြည့် CEO mode — businesses ၅ ခုလုံး review · ဘာ work, ဘာ cut, ဘာ double down · data-driven strategic decisions only.</div>
+    </div>
+    <div class="rec-card" style="border-left:3px solid #D85A30">
+      <div class="rec-title">No-meeting mornings — strictly</div>
+      <div class="rec-body">Client calls, team meetings — 2:30 PM မတိုင်ခင် schedule မချပါနှင့်။ Morning ကို protect မလုပ်ရင် Deep Work တဖြည်းဖြည်း meetings ဝင်ယူသွားမည်။</div>
+    </div>
+    <div class="rec-card" style="border-left:3px solid #1D9E75">
+      <div class="rec-title">Pre-sleep phone rule — 9:45 PM</div>
+      <div class="rec-body">Phone ကို 9:45 PM wind down မှာ အိပ်ခန်းပြင်ခမ်းထားပါ — charge ပါ ဒါပေမယ့် hands reach မကျပါစေနှင့်။ Alarm = standalone clock သုံးပါ။</div>
+    </div>
+    <div class="rec-card" style="border-left:3px solid #3B6D11">
+      <div class="rec-title">Protein-first breakfast habit</div>
+      <div class="rec-body">Deep Work quality က breakfast ပေါ် မူတည်သည်။ ကြက်ဥ ၂-၃ လုံး + protein source + complex carbs = sustained brain energy for 7:30-12:15 deep work window.</div>
+    </div>
+    <div class="rec-card" style="border-left:3px solid #412402">
+      <div class="rec-title">Weekly Digital Detox — Sunday</div>
+      <div class="rec-body">Sunday 11:30-4:30 (Sacred Rest) — phone + laptop ကို ဖွင့်မထားပါနှင့်။ Mental clarity weekly reset = Monday deep work quality ↑ 40%.</div>
+    </div>
+    <div class="rec-card" style="border-left:3px solid #042C53">
+      <div class="rec-title">Gym workout split (suggested)</div>
+      <div class="rec-body">Mon: Chest+Triceps · Tue: Back+Biceps · Wed: Legs · Thu: Shoulders+Core · Fri: Full body · Sat: Full body (longer) · Sun: Rest/light walk. Adjust ဖြစ်ရင် ဖြစ်အောင် ပြောင်းလဲနိုင်သည်။</div>
+    </div>
+  </div>
+
+  <p class="section-title">Book reading roadmap (Year 1)</p>
+  <div class="rule-grid">
+    <div class="rule-card"><div class="num">Business / Systems</div><div class="txt">Buy Back Your Time · The E-Myth Revisited · $100M Offers · Systemology</div></div>
+    <div class="rule-card"><div class="num">Mindset / Discipline</div><div class="txt">Can't Hurt Me (Goggins) · Atomic Habits · 10X Rule · Discipline Equals Freedom</div></div>
+    <div class="rule-card"><div class="num">Investing</div><div class="txt">Psychology of Money · Rich Dad Poor Dad · The Intelligent Investor · Bitcoin Standard</div></div>
+    <div class="rule-card"><div class="num">Language / Learning</div><div class="txt">Fluent Forever · The Art of Learning · Word Power Made Easy · English Grammar in Use</div></div>
+    <div class="rule-card"><div class="num">Buddhist / Spirit</div><div class="txt">ဓမ္မပဒ · ဗုဒ္ဓ-ဝင် · What the Buddha Taught · The Miracle of Mindfulness (Thich Nhat Hanh)</div></div>
+    <div class="rule-card"><div class="num">Content / YouTube</div><div class="txt">Jab Jab Jab Right Hook · Crushing It · Creator's Guide to YouTube · They Ask You Answer</div></div>
+  </div>
+
+  <div class="alert-purple">
+    <p>☸ ညီ့ life ကို သုံးသပ်ကြည့်ရင် — Spirit (Buddhist) + Body (Gym) + Mind (Deep Work + Reading) + Language (EN+Thai) + Finance (Invest) — ဒါ ၅ pillar အကုန် cover ဖြစ်နေပြီ။ Ronaldo လိုပဲ every pillar ကို daily လုပ်ဆောင်ပါ။ 90 ရက် ပြည့်ရင် ညီ့ life ဘယ်လောက် ပြောင်းသွားမလဲ Ko Zin တကယ် မြင်ချင်တယ် ညီလေး။</p>
+  </div>
+</div>
+
+</div><!-- end wrap -->
+
+<script>
+function showTab(name, el){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));
+  document.getElementById(name).classList.add('active');
+  el.classList.add('active');
+}
+
+// Streak tracker
+var TOTAL = 90;
+var KEY = 'bme_streak_v3';
+var state = JSON.parse(localStorage.getItem(KEY) || '[]');
+if(!Array.isArray(state) || state.length !== TOTAL) {
+  state = new Array(TOTAL).fill(false);
+}
+
+function saveState(){ try{ localStorage.setItem(KEY, JSON.stringify(state)); }catch(e){} }
+function renderDots(){
+  var grid = document.getElementById('dots');
+  if(!grid) return;
+  grid.innerHTML = '';
+  var done = 0;
+  state.forEach(function(v,i){
+    var d = document.createElement('div');
+    d.className = 'streak-dot ' + (v ? 'done' : 'empty');
+    d.title = 'Day ' + (i+1);
+    d.onclick = function(){ state[i] = !state[i]; saveState(); renderDots(); };
+    grid.appendChild(d);
+    if(v) done++;
+  });
+  var c = document.getElementById('count');
+  if(c) c.textContent = done;
+}
+function resetStreak(){ if(confirm('Reset all 90 days?')){ state = new Array(TOTAL).fill(false); saveState(); renderDots(); } }
+document.addEventListener('DOMContentLoaded', renderDots);
+setTimeout(renderDots, 100);
+</script>
+</body>
+</html>
