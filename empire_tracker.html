@@ -1,0 +1,913 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Build My Empire — Daily Tracker</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0a0a0f;
+  --surface: #12121a;
+  --surface2: #1a1a26;
+  --border: rgba(255,255,255,0.07);
+  --border2: rgba(255,255,255,0.12);
+  --text: #f0f0f8;
+  --muted: #6b6b88;
+  --green: #1D9E75;
+  --green-dim: rgba(29,158,117,0.15);
+  --green-glow: rgba(29,158,117,0.3);
+  --purple: #7F77DD;
+  --purple-dim: rgba(127,119,221,0.15);
+  --amber: #EF9F27;
+  --amber-dim: rgba(239,159,39,0.15);
+  --coral: #D85A30;
+  --coral-dim: rgba(216,90,48,0.15);
+  --blue: #378ADD;
+  --blue-dim: rgba(55,138,221,0.15);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+html { background: var(--bg); }
+body {
+  font-family: 'Space Grotesk', system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  padding: 0 0 80px;
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+/* Header */
+.header {
+  padding: 24px 20px 16px;
+  border-bottom: 0.5px solid var(--border);
+  background: var(--bg);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+.header-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+.logo { font-size: 13px; font-weight: 600; color: var(--green); letter-spacing: 0.5px; text-transform: uppercase; }
+.date-badge {
+  font-size: 11px;
+  color: var(--muted);
+  background: var(--surface);
+  border: 0.5px solid var(--border);
+  padding: 4px 10px;
+  border-radius: 20px;
+}
+.streak-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--surface);
+  border: 0.5px solid var(--border);
+  border-radius: 12px;
+  padding: 10px 14px;
+}
+.streak-flame { font-size: 18px; }
+.streak-info { flex: 1; }
+.streak-num { font-size: 22px; font-weight: 700; color: var(--green); line-height: 1; }
+.streak-label { font-size: 10px; color: var(--muted); margin-top: 1px; }
+.streak-msg { font-size: 11px; color: var(--amber); font-weight: 500; text-align: right; max-width: 120px; line-height: 1.4; }
+
+/* Tabs */
+.tabs {
+  display: flex;
+  padding: 12px 20px 0;
+  gap: 4px;
+  border-bottom: 0.5px solid var(--border);
+  background: var(--bg);
+  position: sticky;
+  top: 106px;
+  z-index: 9;
+}
+.tab-btn {
+  flex: 1;
+  padding: 8px 4px;
+  font-size: 12px;
+  font-weight: 500;
+  font-family: inherit;
+  color: var(--muted);
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  transition: color 0.2s;
+  text-align: center;
+}
+.tab-btn.active {
+  color: var(--text);
+  border-bottom: 2px solid var(--green);
+}
+
+/* Content */
+.content { padding: 16px 20px; }
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
+
+/* Section */
+.section-title {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 10px;
+  margin-top: 20px;
+}
+.section-title:first-child { margin-top: 0; }
+
+/* Checklist items */
+.check-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 0.5px solid var(--border);
+  background: var(--surface);
+  margin-bottom: 8px;
+  cursor: pointer;
+  transition: all 0.15s;
+  user-select: none;
+}
+.check-item:active { transform: scale(0.98); }
+.check-item.done {
+  background: var(--green-dim);
+  border-color: rgba(29,158,117,0.25);
+}
+.check-dot {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 1.5px solid var(--border2);
+  flex-shrink: 0;
+  margin-top: 1px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+.check-item.done .check-dot {
+  background: var(--green);
+  border-color: var(--green);
+}
+.check-dot-inner {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: white;
+  opacity: 0;
+  transform: scale(0);
+  transition: all 0.2s;
+}
+.check-item.done .check-dot-inner {
+  opacity: 1;
+  transform: scale(1);
+}
+.check-body { flex: 1; min-width: 0; }
+.check-title {
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 2px;
+  transition: color 0.2s;
+}
+.check-item.done .check-title { color: var(--green); }
+.check-sub { font-size: 11px; color: var(--muted); line-height: 1.4; }
+.check-time {
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: 8px;
+  flex-shrink: 0;
+  margin-top: 1px;
+  align-self: flex-start;
+}
+
+/* Progress ring */
+.progress-wrap {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: var(--surface);
+  border: 0.5px solid var(--border);
+  border-radius: 14px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+.ring-wrap { position: relative; width: 64px; height: 64px; flex-shrink: 0; }
+.ring-wrap svg { transform: rotate(-90deg); }
+.ring-bg { fill: none; stroke: var(--surface2); stroke-width: 5; }
+.ring-fill { fill: none; stroke: var(--green); stroke-width: 5; stroke-linecap: round; transition: stroke-dashoffset 0.4s ease; }
+.ring-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text);
+  text-align: center;
+  line-height: 1;
+}
+.ring-text span { font-size: 9px; color: var(--muted); display: block; }
+.progress-info { flex: 1; }
+.progress-big { font-size: 20px; font-weight: 700; color: var(--text); }
+.progress-sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
+.progress-msg { font-size: 11px; color: var(--amber); margin-top: 6px; font-weight: 500; }
+
+/* Complete button */
+.complete-btn {
+  width: 100%;
+  padding: 14px;
+  background: var(--green);
+  color: white;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  margin-top: 16px;
+  transition: all 0.2s;
+  letter-spacing: 0.3px;
+}
+.complete-btn:active { transform: scale(0.98); opacity: 0.9; }
+.complete-btn:disabled {
+  background: var(--surface2);
+  color: var(--muted);
+  cursor: not-allowed;
+}
+
+/* 90-day grid */
+.grid-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+.grid-label { font-size: 13px; font-weight: 600; color: var(--text); }
+.grid-count { font-size: 11px; color: var(--muted); }
+.dot-grid {
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  gap: 5px;
+  margin-bottom: 12px;
+}
+.dot {
+  aspect-ratio: 1;
+  border-radius: 5px;
+  border: 0.5px solid var(--border);
+  background: var(--surface);
+  cursor: pointer;
+  transition: all 0.15s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 8px;
+  color: var(--muted);
+  position: relative;
+}
+.dot:active { transform: scale(0.9); }
+.dot.done { background: var(--green); border-color: var(--green); box-shadow: 0 0 8px var(--green-glow); }
+.dot.today { border-color: var(--amber); border-width: 1.5px; }
+.dot.today:not(.done) { background: var(--amber-dim); }
+.dot-legend {
+  display: flex;
+  gap: 16px;
+  margin-top: 8px;
+}
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: var(--muted);
+}
+.legend-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+}
+
+/* Milestones */
+.milestone {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 0.5px solid var(--border);
+  background: var(--surface);
+  margin-bottom: 6px;
+}
+.milestone.unlocked { border-color: rgba(29,158,117,0.3); background: var(--green-dim); }
+.milestone.unlocked .ms-icon { filter: none; }
+.milestone.locked .ms-icon { filter: grayscale(1) opacity(0.4); }
+.ms-icon { font-size: 20px; flex-shrink: 0; }
+.ms-info { flex: 1; }
+.ms-title { font-size: 12px; font-weight: 600; }
+.milestone.unlocked .ms-title { color: var(--green); }
+.milestone.locked .ms-title { color: var(--muted); }
+.ms-sub { font-size: 10px; color: var(--muted); margin-top: 1px; }
+.ms-badge {
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 8px;
+}
+.milestone.unlocked .ms-badge { background: var(--green-dim); color: var(--green); }
+.milestone.locked .ms-badge { background: var(--surface2); color: var(--muted); }
+
+/* Quote */
+.quote-card {
+  background: var(--purple-dim);
+  border: 0.5px solid rgba(127,119,221,0.2);
+  border-radius: 12px;
+  padding: 14px 16px;
+  margin-bottom: 12px;
+}
+.quote-text { font-size: 12px; color: #AFA9EC; line-height: 1.7; font-style: italic; }
+.quote-attr { font-size: 10px; color: var(--muted); margin-top: 6px; }
+
+/* Reset */
+.reset-btn {
+  width: 100%;
+  padding: 10px;
+  background: none;
+  color: var(--muted);
+  font-family: inherit;
+  font-size: 12px;
+  border: 0.5px solid var(--border);
+  border-radius: 10px;
+  cursor: pointer;
+  margin-top: 16px;
+  transition: all 0.2s;
+}
+.reset-btn:hover { color: var(--coral); border-color: var(--coral-dim); }
+
+/* Toast */
+.toast {
+  position: fixed;
+  bottom: 80px;
+  left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background: var(--surface2);
+  border: 0.5px solid var(--border2);
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 500;
+  padding: 10px 20px;
+  border-radius: 20px;
+  opacity: 0;
+  transition: all 0.3s;
+  pointer-events: none;
+  white-space: nowrap;
+  z-index: 100;
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* Loading */
+.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  color: var(--muted);
+  font-size: 13px;
+  gap: 8px;
+}
+.spin {
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--border2);
+  border-top-color: var(--green);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-top">
+    <div class="logo">⚡ Build My Empire</div>
+    <div class="date-badge" id="dateBadge">Loading...</div>
+  </div>
+  <div class="streak-bar">
+    <div class="streak-flame">🔥</div>
+    <div class="streak-info">
+      <div class="streak-num" id="streakNum">0</div>
+      <div class="streak-label">day streak</div>
+    </div>
+    <div class="streak-msg" id="streakMsg">ယနေ့ Day 1 စပါ</div>
+  </div>
+</div>
+
+<div class="tabs">
+  <button class="tab-btn active" onclick="showTab('today')">ယနေ့</button>
+  <button class="tab-btn" onclick="showTab('tracker')">90 ရက်</button>
+  <button class="tab-btn" onclick="showTab('milestones')">Milestones</button>
+</div>
+
+<div class="content">
+
+  <!-- TODAY TAB -->
+  <div id="tab-today" class="tab-panel active">
+    <div id="loadingToday" class="loading"><div class="spin"></div> Loading...</div>
+    <div id="todayContent" style="display:none">
+
+      <div class="progress-wrap">
+        <div class="ring-wrap">
+          <svg width="64" height="64" viewBox="0 0 64 64">
+            <circle class="ring-bg" cx="32" cy="32" r="27"/>
+            <circle class="ring-fill" id="ringFill" cx="32" cy="32" r="27"
+              stroke-dasharray="169.6"
+              stroke-dashoffset="169.6"/>
+          </svg>
+          <div class="ring-text" id="ringText">0<span>/ 8</span></div>
+        </div>
+        <div class="progress-info">
+          <div class="progress-big" id="progressBig">0 / 8 ပြီး</div>
+          <div class="progress-sub" id="progressSub">ယနေ့ tasks</div>
+          <div class="progress-msg" id="progressMsg">Ronaldo training session မဖွင့်ရသေးပါ</div>
+        </div>
+      </div>
+
+      <div class="section-title">☸ Spirit & Body</div>
+
+      <div class="check-item" id="item-spirit" onclick="toggleItem('spirit')">
+        <div class="check-dot"><div class="check-dot-inner"></div></div>
+        <div class="check-body">
+          <div class="check-title">ဗုဒ္ဓဘာသာ morning practice</div>
+          <div class="check-sub">ရွတ်ဆို · တရားထိုင် · ဓမ္မပဒ · Metta</div>
+        </div>
+        <div class="check-time" style="background:var(--purple-dim);color:var(--purple)">6:00</div>
+      </div>
+
+      <div class="check-item" id="item-gym" onclick="toggleItem('gym')">
+        <div class="check-dot"><div class="check-dot-inner"></div></div>
+        <div class="check-body">
+          <div class="check-title">Gym — Mixed training (1.5 hr)</div>
+          <div class="check-sub">Strength · Cardio · Cold shower ပြီးမှ ✓</div>
+        </div>
+        <div class="check-time" style="background:var(--green-dim);color:var(--green)">6:15 PM</div>
+      </div>
+
+      <div class="section-title">⚡ Deep Work</div>
+
+      <div class="check-item" id="item-deep1" onclick="toggleItem('deep1')">
+        <div class="check-dot"><div class="check-dot-inner"></div></div>
+        <div class="check-body">
+          <div class="check-title">Deep Work Block 1 (2.5 hr)</div>
+          <div class="check-sub">Mr. Dream English · Book · Phone ပိတ်</div>
+        </div>
+        <div class="check-time" style="background:var(--purple-dim);color:var(--purple)">7:30</div>
+      </div>
+
+      <div class="check-item" id="item-deep2" onclick="toggleItem('deep2')">
+        <div class="check-dot"><div class="check-dot-inner"></div></div>
+        <div class="check-body">
+          <div class="check-title">Deep Work Block 2 (2 hr)</div>
+          <div class="check-sub">BSM · KDP · YouTube Empire planning</div>
+        </div>
+        <div class="check-time" style="background:var(--purple-dim);color:var(--purple)">10:15</div>
+      </div>
+
+      <div class="section-title">📚 Learning</div>
+
+      <div class="check-item" id="item-language" onclick="toggleItem('language')">
+        <div class="check-dot"><div class="check-dot-inner"></div></div>
+        <div class="check-body">
+          <div class="check-title">Language learning (1.5 hr)</div>
+          <div class="check-sub">English 50min · Thai 40min</div>
+        </div>
+        <div class="check-time" style="background:var(--blue-dim);color:var(--blue)">1:00 PM</div>
+      </div>
+
+      <div class="check-item" id="item-reading" onclick="toggleItem('reading')">
+        <div class="check-dot"><div class="check-dot-inner"></div></div>
+        <div class="check-body">
+          <div class="check-title">Reading — 1 chapter</div>
+          <div class="check-sub">Physical book · screen မဟုတ်ဘဲ</div>
+        </div>
+        <div class="check-time" style="background:var(--amber-dim);color:var(--amber)">9:00 PM</div>
+      </div>
+
+      <div class="section-title">💰 Finance</div>
+
+      <div class="check-item" id="item-invest" onclick="toggleItem('invest')">
+        <div class="check-dot"><div class="check-dot-inner"></div></div>
+        <div class="check-body">
+          <div class="check-title">Investment block (30 min)</div>
+          <div class="check-sub">Crypto · Stocks · Portfolio check</div>
+        </div>
+        <div class="check-time" style="background:var(--blue-dim);color:var(--blue)">8:30 PM</div>
+      </div>
+
+      <div class="section-title">🌙 Recovery</div>
+
+      <div class="check-item" id="item-sleep" onclick="toggleItem('sleep')">
+        <div class="check-dot"><div class="check-dot-inner"></div></div>
+        <div class="check-body">
+          <div class="check-title">Sleep by 11 PM — 7 hours</div>
+          <div class="check-sub">Phone အပြင်ခမ်း · 11 PM → 6 AM</div>
+        </div>
+        <div class="check-time" style="background:rgba(100,100,120,0.2);color:var(--muted)">11 PM</div>
+      </div>
+
+      <button class="complete-btn" id="completeBtn" onclick="markDayDone()" disabled>
+        ယနေ့ Complete ✓
+      </button>
+
+    </div>
+  </div>
+
+  <!-- 90-DAY TRACKER TAB -->
+  <div id="tab-tracker" class="tab-panel">
+    <div id="loadingTracker" class="loading"><div class="spin"></div> Loading...</div>
+    <div id="trackerContent" style="display:none">
+
+      <div class="quote-card">
+        <div class="quote-text">"I've seen players with more talent than me who never made it because they couldn't work every single day."</div>
+        <div class="quote-attr">— Cristiano Ronaldo</div>
+      </div>
+
+      <div class="grid-header">
+        <div class="grid-label">90-Day Ronaldo Streak</div>
+        <div class="grid-count" id="dotCount">0 / 90</div>
+      </div>
+
+      <div class="dot-grid" id="dotGrid"></div>
+
+      <div class="dot-legend">
+        <div class="legend-item">
+          <div class="legend-dot" style="background:var(--green)"></div>
+          <span>Complete</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-dot" style="border:1.5px solid var(--amber);background:var(--amber-dim)"></div>
+          <span>Today</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-dot" style="background:var(--surface);border:0.5px solid var(--border)"></div>
+          <span>Pending</span>
+        </div>
+      </div>
+
+      <button class="reset-btn" onclick="confirmReset()">Reset 90-day tracker</button>
+    </div>
+  </div>
+
+  <!-- MILESTONES TAB -->
+  <div id="tab-milestones" class="tab-panel">
+    <div id="loadingMilestones" class="loading"><div class="spin"></div> Loading...</div>
+    <div id="milestonesContent" style="display:none">
+
+      <div class="section-title">Streak milestones</div>
+
+      <div class="milestone" id="ms-1">
+        <div class="ms-icon">⚡</div>
+        <div class="ms-info">
+          <div class="ms-title">First spark</div>
+          <div class="ms-sub">Day 1 complete — journey started</div>
+        </div>
+        <div class="ms-badge">Day 1</div>
+      </div>
+
+      <div class="milestone" id="ms-7">
+        <div class="ms-icon">🔥</div>
+        <div class="ms-info">
+          <div class="ms-title">Week warrior</div>
+          <div class="ms-sub">7 consecutive days — habit forming</div>
+        </div>
+        <div class="ms-badge">Day 7</div>
+      </div>
+
+      <div class="milestone" id="ms-21">
+        <div class="ms-icon">🧠</div>
+        <div class="ms-info">
+          <div class="ms-title">Neural rewire</div>
+          <div class="ms-sub">21 days — new neural pathways locked in</div>
+        </div>
+        <div class="ms-badge">Day 21</div>
+      </div>
+
+      <div class="milestone" id="ms-30">
+        <div class="ms-icon">🏆</div>
+        <div class="ms-info">
+          <div class="ms-title">One month champion</div>
+          <div class="ms-sub">30 days — stronger than 95% of people</div>
+        </div>
+        <div class="ms-badge">Day 30</div>
+      </div>
+
+      <div class="milestone" id="ms-66">
+        <div class="ms-icon">💎</div>
+        <div class="ms-info">
+          <div class="ms-title">Automatic</div>
+          <div class="ms-sub">66 days — habit is now automatic (science)</div>
+        </div>
+        <div class="ms-badge">Day 66</div>
+      </div>
+
+      <div class="milestone" id="ms-90">
+        <div class="ms-icon">👑</div>
+        <div class="ms-info">
+          <div class="ms-title">Ronaldo level</div>
+          <div class="ms-sub">90 days — identity changed forever</div>
+        </div>
+        <div class="ms-badge">Day 90</div>
+      </div>
+
+      <div class="section-title" style="margin-top:20px">Phase milestones (income)</div>
+
+      <div class="milestone" id="ms-p1">
+        <div class="ms-icon">🚀</div>
+        <div class="ms-info">
+          <div class="ms-title">Phase 1 — Foundation</div>
+          <div class="ms-sub">First video + book published</div>
+        </div>
+        <div class="ms-badge">$5,500/mo</div>
+      </div>
+
+      <div class="milestone" id="ms-p2">
+        <div class="ms-icon">📈</div>
+        <div class="ms-info">
+          <div class="ms-title">Phase 2 — Momentum</div>
+          <div class="ms-sub">500+ subs · Book 2 written</div>
+        </div>
+        <div class="ms-badge">$9,000/mo</div>
+      </div>
+
+      <div class="milestone" id="ms-p3">
+        <div class="ms-icon">⚡</div>
+        <div class="ms-info">
+          <div class="ms-title">Phase 3 — Scale</div>
+          <div class="ms-sub">YPP monetized · 5-10 channels</div>
+        </div>
+        <div class="ms-badge">$18,000/mo</div>
+      </div>
+
+      <div class="milestone" id="ms-p5">
+        <div class="ms-icon">💰</div>
+        <div class="ms-info">
+          <div class="ms-title">Phase 5 — Millionaire</div>
+          <div class="ms-sub">$1M net worth · 2030 target</div>
+        </div>
+        <div class="ms-badge">$1M NW</div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+var STORAGE_KEY = 'bme_v3_data';
+var data = {
+  startDate: null,
+  days: {},
+  streak: 0,
+  todayItems: {}
+};
+
+function getTodayKey() {
+  var d = new Date();
+  return d.getFullYear() + '-' + (d.getMonth()+1) + '-' + d.getDate();
+}
+
+function getDateLabel() {
+  var d = new Date();
+  var days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  return days[d.getDay()] + ', ' + d.getDate() + ' ' + months[d.getMonth()] + ' ' + d.getFullYear();
+}
+
+async function loadData() {
+  try {
+    var result = await window.storage.get(STORAGE_KEY);
+    if (result && result.value) {
+      data = JSON.parse(result.value);
+    }
+  } catch(e) {
+    // fresh start
+  }
+  if (!data.startDate) {
+    data.startDate = getTodayKey();
+  }
+  if (!data.days) data.days = {};
+  if (!data.todayItems) data.todayItems = {};
+  renderAll();
+}
+
+async function saveData() {
+  try {
+    await window.storage.set(STORAGE_KEY, JSON.stringify(data));
+  } catch(e) {}
+}
+
+function calcStreak() {
+  var streak = 0;
+  var d = new Date();
+  while(true) {
+    var key = d.getFullYear() + '-' + (d.getMonth()+1) + '-' + d.getDate();
+    if (data.days[key]) {
+      streak++;
+      d.setDate(d.getDate() - 1);
+    } else {
+      break;
+    }
+  }
+  return streak;
+}
+
+function getDayIndex(dateKey) {
+  if (!data.startDate) return 0;
+  var start = new Date(data.startDate);
+  var parts = dateKey.split('-');
+  var curr = new Date(parseInt(parts[0]), parseInt(parts[1])-1, parseInt(parts[2]));
+  var diff = Math.floor((curr - start) / 86400000);
+  return diff;
+}
+
+var ITEMS = ['spirit','gym','deep1','deep2','language','reading','invest','sleep'];
+
+function toggleItem(id) {
+  var today = getTodayKey();
+  if (!data.todayItems[today]) data.todayItems[today] = {};
+  data.todayItems[today][id] = !data.todayItems[today][id];
+  saveData();
+  renderToday();
+}
+
+function markDayDone() {
+  var today = getTodayKey();
+  data.days[today] = true;
+  saveData();
+  renderAll();
+  showToast('🔥 Day ' + (getDayIndex(today)+1) + ' complete! Ronaldo proud.');
+}
+
+function confirmReset() {
+  if (confirm('Reset all 90 days? This cannot be undone.')) {
+    data.days = {};
+    data.todayItems = {};
+    data.startDate = getTodayKey();
+    data.streak = 0;
+    saveData();
+    renderAll();
+    showToast('Reset done. Day 1 starts now.');
+  }
+}
+
+function renderAll() {
+  renderHeader();
+  renderToday();
+  renderTracker();
+  renderMilestones();
+  hideLoadings();
+}
+
+function hideLoadings() {
+  ['Today','Tracker','Milestones'].forEach(function(n) {
+    var l = document.getElementById('loading' + n);
+    var c = document.getElementById(n.toLowerCase() + 'Content');
+    if(l) l.style.display = 'none';
+    if(c) c.style.display = 'block';
+  });
+}
+
+function renderHeader() {
+  document.getElementById('dateBadge').textContent = getDateLabel();
+  var streak = calcStreak();
+  document.getElementById('streakNum').textContent = streak;
+  var msgs = ['ယနေ့ Day 1 စပါ', 'Keep going!', 'Unstoppable!', 'Week done!', 'Elite level!'];
+  var msg = streak === 0 ? 'ယနေ့ Day 1 စပါ' :
+            streak < 7 ? streak + ' day streak 🔥' :
+            streak < 21 ? 'Week warrior! 💪' :
+            streak < 66 ? 'Ronaldo mode 👑' : 'LEGEND 🏆';
+  document.getElementById('streakMsg').textContent = msg;
+}
+
+function renderToday() {
+  var today = getTodayKey();
+  var items = (data.todayItems[today]) || {};
+  var done = 0;
+  ITEMS.forEach(function(id) {
+    var el = document.getElementById('item-' + id);
+    if (!el) return;
+    var checked = !!items[id];
+    if (checked) { el.classList.add('done'); done++; }
+    else el.classList.remove('done');
+  });
+
+  var pct = Math.round((done / 8) * 100);
+  var circ = 169.6;
+  var offset = circ - (circ * done / 8);
+  document.getElementById('ringFill').style.strokeDashoffset = offset;
+  document.getElementById('ringText').innerHTML = done + '<span>/ 8</span>';
+  document.getElementById('progressBig').textContent = done + ' / 8 ပြီး';
+
+  var msgs = [
+    'Ronaldo training session မဖွင့်ရသေးပါ',
+    'စတင်ပြီ — momentum build နေပြီ 💪',
+    'Half way — ဆက်လုပ် ညီ! 🔥',
+    'Almost done — push through! ⚡',
+    'Perfect day — Ronaldo level! 👑'
+  ];
+  var msgIdx = done === 0 ? 0 : done <= 2 ? 1 : done <= 4 ? 2 : done <= 6 ? 3 : 4;
+  document.getElementById('progressMsg').textContent = msgs[msgIdx];
+
+  var allDone = done === 8;
+  var alreadyMarked = !!data.days[today];
+  var btn = document.getElementById('completeBtn');
+  if (alreadyMarked) {
+    btn.textContent = '✓ ယနေ့ Complete ဖြစ်ပြီ!';
+    btn.disabled = true;
+  } else {
+    btn.textContent = allDone ? 'ယနေ့ Complete ✓ — Streak တိုး!' : 'Complete မဖြစ်သေး (' + (8-done) + ' remaining)';
+    btn.disabled = !allDone;
+  }
+}
+
+function renderTracker() {
+  var grid = document.getElementById('dotGrid');
+  if (!grid) return;
+  grid.innerHTML = '';
+  var today = getTodayKey();
+  var start = new Date(data.startDate || today);
+  var doneDays = 0;
+
+  for (var i = 0; i < 90; i++) {
+    var d = new Date(start);
+    d.setDate(d.getDate() + i);
+    var key = d.getFullYear() + '-' + (d.getMonth()+1) + '-' + d.getDate();
+    var dot = document.createElement('div');
+    dot.className = 'dot';
+    dot.title = 'Day ' + (i+1);
+
+    if (data.days[key]) {
+      dot.classList.add('done');
+      doneDays++;
+    }
+    if (key === today) {
+      dot.classList.add('today');
+    }
+    var dayNum = document.createElement('span');
+    dayNum.textContent = i + 1;
+    dot.appendChild(dayNum);
+    grid.appendChild(dot);
+  }
+  document.getElementById('dotCount').textContent = doneDays + ' / 90';
+}
+
+function renderMilestones() {
+  var streak = calcStreak();
+  var thresholds = {1: 'ms-1', 7: 'ms-7', 21: 'ms-21', 30: 'ms-30', 66: 'ms-66', 90: 'ms-90'};
+  Object.keys(thresholds).forEach(function(n) {
+    var el = document.getElementById(thresholds[n]);
+    if (!el) return;
+    if (streak >= parseInt(n)) {
+      el.classList.add('unlocked');
+      el.classList.remove('locked');
+    } else {
+      el.classList.add('locked');
+      el.classList.remove('unlocked');
+    }
+  });
+  // Income milestones always locked for now
+  ['ms-p1','ms-p2','ms-p3','ms-p5'].forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) { el.classList.add('locked'); el.classList.remove('unlocked'); }
+  });
+}
+
+function showTab(name) {
+  document.querySelectorAll('.tab-panel').forEach(function(p) { p.classList.remove('active'); });
+  document.querySelectorAll('.tab-btn').forEach(function(b) { b.classList.remove('active'); });
+  document.getElementById('tab-' + name).classList.add('active');
+  event.target.classList.add('active');
+}
+
+function showToast(msg) {
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(function() { t.classList.remove('show'); }, 2500);
+}
+
+loadData();
+</script>
+</body>
+</html>
